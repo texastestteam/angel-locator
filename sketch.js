@@ -1,6 +1,7 @@
 let worldMapImg;
 let timeElement;
 let locationElement;
+let randomButton;
 
 function preload() {
     // Load a world map image
@@ -15,11 +16,17 @@ function setup() {
     timeElement = select('#time');
     locationElement = select('#location');
 
+    // Get reference to the random button
+    randomButton = select('#randomButton');
+
     // Update time and location
     updateTimeAndLocation();
 
     // Update time every second
     setInterval(updateTimeAndLocation, 1000);
+
+    // Add event listener to the random button
+    randomButton.mousePressed(drawRandomTarget);
 }
 
 function updateTimeAndLocation() {
@@ -39,4 +46,19 @@ function showPosition(position) {
     let lat = position.coords.latitude;
     let lon = position.coords.longitude;
     locationElement.html(`Latitude: ${lat.toFixed(2)}, Longitude: ${lon.toFixed(2)}`);
+}
+
+function drawRandomTarget() {
+    // Clear the previous target
+    clear();
+    image(worldMapImg, 0, 0, width, height);
+
+    // Generate random coordinates within the canvas
+    let randomX = random(width);
+    let randomY = random(height);
+
+    // Draw a red transparent circle at the random coordinates
+    fill(255, 0, 0, 127);
+    noStroke();
+    ellipse(randomX, randomY, 50, 50); // Adjust the size as needed
 }
