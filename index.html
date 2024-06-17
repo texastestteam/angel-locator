@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Target</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #map {
+            border: 1px solid #000;
+        }
+        #info {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>˚₊‧꒰ა ₍ᐢ.  ̫.ᐢ₎ ໒꒱ ‧₊˚</h1>
+    <div id="map-container">
+        <canvas id="worldMap"></canvas>
+    </div>
+    <div id="info">
+        <p>Time: <span id="time"></span></p>
+        <p>Location: <span id="location"></span></p>
+    </div>
+    <script src="sketch.js"></script>
+</body>
+</html>
