@@ -1,198 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Random Target Application</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #000000; /* Black background */
-            color: #FFFFFF; /* White text */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .hidden {
-            display: none;
-        }
-        #loading-text {
-            font-size: 24px;
-            white-space: pre-wrap;
-            color: #00FF00; /* Green text for loading screen */
-            background-color: #333333; /* Dark grey background for loading text */
-            font-family: 'Courier New', Courier, monospace;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #0080E8; /* Blue background for button */
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        #map {
-            width: 800px;
-            height: 400px;
-            border: 1px solid #FFFFFF; /* White border for map */
-        }
-        #info {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Initial Screen -->
-    <div id="initial-screen">
-        <h1>howdy</h1>
-        <button onclick="startLoading()">Ready</button>
-    </div>
+let worldMapImg;
+let timeElement;
+let locationElement;
+let randomButton;
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="hidden">
-        <div id="loading-text"></div>
-    </div>
+function preload() {
+    // Load a world map image
+    worldMapImg = loadImage('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
+}
 
-    <!-- Main Screen -->
-    <div id="main-screen" class="hidden">
-        <h1>꒰ঌ( ⌯’ ‘⌯)໒꒱</h1>
-        <button id="randomButton">:)</button>
-        <div id="map"></div>
-        <div id="info">
-            <p>Your Time: <span id="time"></span></p>
-            <p>Your Location: <span id="location"></span></p>
-            <p>Target Location: <span id="target-location"></span></p>
-            <p>Target Time: <span id="target-time"></span></p>
-        </div>
-    </div>
+function setup() {
+    createCanvas(800, 400);
+    image(worldMapImg, 0, 0, width, height);
 
-    <script>
-        // Typing effect for the loading screen
-        const loadingText = `Accessing system...\nVerifying credentials...\nAccess granted.\nLoading target application...`;
-        const loadingElement = document.getElementById('loading-text');
-        let index = 0;
+    // Get references to the time and location elements
+    timeElement = select('#time');
+    locationElement = select('#location');
 
-        function typeEffect(callback) {
-            if (index < loadingText.length) {
-                loadingElement.innerHTML += loadingText.charAt(index);
-                index++;
-                setTimeout(() => typeEffect(callback), 50); // Adjust typing speed here
-            } else {
-                setTimeout(callback, 1000); // Adjust delay before redirecting
-            }
-        }
+    // Get reference to the random button
+    randomButton = select('#randomButton');
 
-        function startLoading() {
-            document.getElementById('initial-screen').classList.add('hidden');
-            document.getElementById('loading-screen').classList.remove('hidden');
-            typeEffect(showMainScreen);
-        }
+    // Update time and location
+    updateTimeAndLocation();
 
-        function showMainScreen() {
-            document.getElementById('loading-screen').classList.add('hidden');
-            document.getElementById('main-screen').classList.remove('hidden');
-            initMap();
-        }
+    // Update time every second
+    setInterval(updateTimeAndLocation, 1000);
 
-        let map;
-        let marker;
+    // Add event listener to the random button
+    randomButton.mousePressed(drawRandomTarget);
+}
 
-        function initMap() {
-            map = L.map('map').setView([0, 0], 2);
+function updateTimeAndLocation() {
+    // Get current time
+    let now = new Date();
+    timeElement.html(now.toLocaleTimeString());
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+    // Get current location (using a placeholder for now)
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        locationElement.html("Geolocation is not supported by this browser.");
+    }
+}
 
-            // Update time and location
-            updateTimeAndLocation();
+function showPosition(position) {
+    let lat = position.coords.latitude;
+    let lon = position.coords.longitude;
+    locationElement.html(`Latitude: ${lat.toFixed(2)}, Longitude: ${lon.toFixed(2)}`);
+}
 
-            // Update time every second
-            setInterval(updateTimeAndLocation, 1000);
+function drawRandomTarget() {
+    // Clear the previous target
+    clear();
+    image(worldMapImg, 0, 0, width, height);
 
-            // Add event listener to the random button
-            document.getElementById('randomButton').addEventListener('click', generateRandomTarget);
-        }
+    // Generate random coordinates within the canvas
+    let randomX = random(width);
+    let randomY = random(height);
 
-        function updateTimeAndLocation() {
-            // Get current time
-            let now = new Date();
-            document.getElementById('time').innerHTML = now.toLocaleTimeString();
-
-            // Get current location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                document.getElementById('location').innerHTML = "Geolocation is not supported by this browser.";
-            }
-        }
-
-        function showPosition(position) {
-            let lat = position.coords.latitude;
-            let lon = position.coords.longitude;
-            document.getElementById('location').innerHTML = `Latitude: ${lat.toFixed(2)}, Longitude: ${lon.toFixed(2)}`;
-        }
-
-        function generateRandomTarget() {
-            // Generate random coordinates
-            let randomLat = (Math.random() * 180) - 90;
-            let randomLng = (Math.random() * 360) - 180;
-            let latLng = [randomLat, randomLng];
-
-            // Place marker on the map
-            if (marker) {
-                map.removeLayer(marker);
-            }
-            marker = L.marker(latLng).addTo(map);
-            map.setView(latLng, 4);
-
-            // Reverse geocode the random coordinates to get location information
-            reverseGeocode(latLng);
-        }
-
-        function reverseGeocode(latLng) {
-            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latLng[0]}&lon=${latLng[1]}&zoom=10&addressdetails=1`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.address) {
-                        document.getElementById('target-location').innerHTML = data.display_name;
-                        // Get the local time for the target location
-                        getTimeForLocation(latLng);
-                    } else {
-                        document.getElementById('target-location').innerHTML = 'No results found';
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('target-location').innerHTML = 'Error retrieving location data';
-                });
-        }
-
-        function getTimeForLocation(latLng) {
-            const apiKey = 'YOUR_TIMEZONE_API_KEY'; // Replace with your timezone API key
-            const url = `https://maps.googleapis.com/maps/api/timezone/json?location=${latLng[0]},${latLng[1]}&timestamp=${Math.floor(Date.now() / 1000)}&key=${apiKey}`;
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'OK') {
-                        const localTime = new Date((data.dstOffset + data.rawOffset + Date.now() / 1000) * 1000);
-                        document.getElementById('target-time').innerHTML = localTime.toLocaleTimeString();
-                    } else {
-                        document.getElementById('target-time').innerHTML = 'Time data unavailable';
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('target-time').innerHTML = 'Error retrieving time data';
-                });
-        }
-    </script>
-</body>
-</html>
+    // Draw a red transparent circle at the random coordinates
+    fill(255, 0, 0, 127);
+    noStroke();
+    ellipse(randomX, randomY, 50, 50); // Adjust the size as needed
+}
