@@ -2,48 +2,166 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Random Target</title>
+    <title>Random Target Application</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #8D8D8D; /* Black background */
+            color: #FFFFFF; /* White text */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            overflow: hidden;
         }
-        #map {
-            border: 1px solid #000;
+        .hidden {
+            display: none;
         }
-        #info {
-            margin-top: 10px;
+        #loading-text {
+            font-size: 24px;
+            white-space: pre-wrap;
+            color: #00FF00; /* Green text for loading screen */
+            font-family: 'Courier New', Courier, monospace;
         }
         button {
-            margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #007BFF;
+            background-color: #0080E8; /* Blue background for button */
             color: white;
             border: none;
             border-radius: 5px;
         }
+        #map {
+            border: 1px solid #FFFFFF; /* White border for map */
+        }
+        #info {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-  <br>
-    <h2> ꒰ঌ ૮ ོ .• ༝ •.   ོ𑁬  ໒꒱</h2>
-    <button id="randomButton">Random</button>
-    <div id="map-container">
-        <canvas id="worldMap"></canvas>
+    <!-- Initial Screen -->
+    <div id="initial-screen">
+        <h1>howdy</h1>
+        <button onclick="startLoading()">Ready</button>
     </div>
-    <div id="info">
-        <p>Time: <span id="time"></span></p>
-        <p>Location: <span id="location"></span></p>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="hidden">
+        <div id="loading-text"></div>
     </div>
-    <script src="sketch.js"></script>
+
+    <!-- Main Screen -->
+    <div id="main-screen" class="hidden">
+        <h1>꒰ঌ( ⌯’ ‘⌯)໒꒱</h1>
+        <button id="randomButton">:)</button>
+        <div id="map-container">
+            <canvas id="worldMap"></canvas>
+        </div>
+        <div id="info">
+            <p>Time: <span id="time"></span></p>
+            <p>Location: <span id="location"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Typing effect for the loading screen
+        const loadingText = `Accessing system...\nVerifying credentials...\nAccess granted.\nLoading target application...`;
+        const loadingElement = document.getElementById('loading-text');
+        let index = 0;
+
+        function typeEffect(callback) {
+            if (index < loadingText.length) {
+                loadingElement.innerHTML += loadingText.charAt(index);
+                index++;
+                setTimeout(() => typeEffect(callback), 50); // Adjust typing speed here
+            } else {
+                setTimeout(callback, 1000); // Adjust delay before redirecting
+            }
+        }
+
+        function startLoading() {
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('loading-screen').classList.remove('hidden');
+            typeEffect(showMainScreen);
+        }
+
+        function showMainScreen() {
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('main-screen').classList.remove('hidden');
+            setupP5Sketch();
+        }
+
+        // Ensure p5.js functions are within the p5.js instance
+        function setupP5Sketch() {
+            let worldMapImg;
+            let timeElement = document.getElementById('time');
+            let locationElement = document.getElementById('location');
+            let randomButton = document.getElementById('randomButton');
+            let canvas;
+
+            new p5((sketch) => {
+                sketch.preload = () => {
+                    worldMapImg = sketch.loadImage('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
+                };
+
+                sketch.setup = () => {
+                    canvas = sketch.createCanvas(800, 400);
+                    canvas.parent('map-container');
+                    sketch.image(worldMapImg, 0, 0, sketch.width, sketch.height);
+
+                    // Update time and location
+                    updateTimeAndLocation();
+
+                    // Update time every second
+                    setInterval(updateTimeAndLocation, 1000);
+
+                    // Add event listener to the random button
+                    randomButton.addEventListener('click', drawRandomTarget);
+                };
+
+                function updateTimeAndLocation() {
+                    // Get current time
+                    let now = new Date();
+                    timeElement.innerHTML = now.toLocaleTimeString();
+
+                    // Get current location (using a placeholder for now)
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(showPosition);
+                    } else {
+                        locationElement.innerHTML = "Geolocation is not supported by this browser.";
+                    }
+                }
+
+                function showPosition(position) {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    locationElement.innerHTML = `Latitude: ${lat.toFixed(2)}, Longitude: ${lon.toFixed(2)}`;
+                }
+
+                function drawRandomTarget() {
+                    // Clear the previous target
+                    sketch.clear();
+                    sketch.image(worldMapImg, 0, 0, sketch.width, sketch.height);
+
+                    // Generate random coordinates within the canvas
+                    let randomX = Math.random() * sketch.width;
+                    let randomY = Math.random() * sketch.height;
+
+                    // Draw a red transparent circle at the random coordinates
+                    sketch.fill(255, 0, 0, 127);
+                    sketch.noStroke();
+                    sketch.ellipse(randomX, randomY, 50, 50); // Adjust the size as needed
+
+                    // Optionally, log the coordinates or perform other actions
+                    console.log(`Random target coordinates: (${randomX.toFixed(2)}, ${randomY.toFixed(2)})`);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
