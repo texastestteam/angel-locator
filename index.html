@@ -8,7 +8,8 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #E7E7E7;
+            background-color: #8D8D8D; /* Black background */
+            color: #FFFFFF; /* White text */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,20 +23,20 @@
         #loading-text {
             font-size: 24px;
             white-space: pre-wrap;
-            color: #00FF00;
+            color: #00FF00; /* Green text for loading screen */
             font-family: 'Courier New', Courier, monospace;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #000000;
+            background-color: #0080E8; /* Blue background for button */
             color: white;
             border: none;
             border-radius: 5px;
         }
         #map {
-            border: 1px solid #FFFFFF;
+            border: 1px solid #FFFFFF; /* White border for map */
         }
         #info {
             margin-top: 10px;
@@ -155,6 +156,9 @@
                     sketch.fill(255, 0, 0, 127);
                     sketch.noStroke();
                     sketch.ellipse(randomX, randomY, 50, 50); // Adjust the size as needed
+
+                    // Optionally, log the coordinates or perform other actions
+                    console.log(`Random target coordinates: (${randomX.toFixed(2)}, ${randomY.toFixed(2)})`);
                 }
             });
         }
