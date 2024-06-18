@@ -65,7 +65,7 @@
     <!-- Main Screen -->
     <div id="main-screen" class="hidden">
         <center>
-            <h1>꒰ঌ( ⌯’ ‘⌯)໒꒱</h1>
+            <h1>໒꒰ྀིっ˕ -｡꒱ྀི১</h1>
             <button id="randomButton">:)</button>
             <div id="map"></div>
             <div id="info">
@@ -74,6 +74,7 @@
                 <p>Target Location: <span id="target-location"></span></p>
                 <p>Target Coordinates: <span id="target-coordinates"></span></p>
             </div>
+            <button id="searchButton" class="hidden">Search</button>
         </center>
     </div>
 
@@ -180,17 +181,28 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.address) {
-                        document.getElementById('target-location').innerHTML = data.display_name;
+                        const locationName = data.display_name;
+                        document.getElementById('target-location').innerHTML = locationName;
                         document.getElementById('target-coordinates').innerHTML = `Latitude: ${latLng[0].toFixed(2)}, Longitude: ${latLng[1].toFixed(2)}`;
+                        document.getElementById('searchButton').classList.remove('hidden');
+                        document.getElementById('searchButton').onclick = () => searchLocation(locationName);
                     } else {
                         document.getElementById('target-location').innerHTML = 'No results found';
                         document.getElementById('target-coordinates').innerHTML = '';
+                        document.getElementById('searchButton').classList.add('hidden');
                     }
                 })
                 .catch(error => {
                     document.getElementById('target-location').innerHTML = 'Error retrieving location data';
                     document.getElementById('target-coordinates').innerHTML = '';
+                    document.getElementById('searchButton').classList.add('hidden');
                 });
+        }
+
+        function searchLocation(locationName) {
+            const query = encodeURIComponent(locationName);
+            const url = `https://www.google.com/search?q=${query}`;
+            window.open(url, '_blank');
         }
     </script>
 </body>
