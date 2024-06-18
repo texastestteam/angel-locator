@@ -12,6 +12,7 @@ The Random Target Application is a web-based tool that displays a world map and 
   - Displays the user's current time and location.
   - Displays a randomly chosen target location with coordinates.
   - Draws a 100-mile radius circle around the target location.
+  - Button to search the target location on Google.
   - Mobile-responsive design.
 
 ## Technologies Used
